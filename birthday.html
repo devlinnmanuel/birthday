@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Cake</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f9f0ff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #8a2be2;
+            margin-bottom: 30px;
+        }
+
+        .cake-container {
+            position: relative;
+            width: 300px;
+            height: 250px;
+            margin-bottom: 30px;
+        }
+
+        .cake {
+            position: absolute;
+            width: 100%;
+            height: 150px;
+            background-color: #ff9dd1;
+            border-radius: 10px 10px 0 0;
+            bottom: 0;
+        }
+
+        .frosting {
+            position: absolute;
+            width: 100%;
+            height: 30px;
+            background-color: #fff;
+            border-radius: 10px 10px 0 0;
+            bottom: 150px;
+        }
+
+        .candle {
+            position: absolute;
+            width: 10px;
+            height: 60px;
+            background-color: #fff;
+            bottom: 180px;
+            border-radius: 5px;
+        }
+
+        .flame {
+            position: absolute;
+            width: 12px;
+            height: 20px;
+            background-color: #ff9900;
+            border-radius: 50% 50% 20% 20%;
+            bottom: 240px;
+            opacity: 0;
+            box-shadow: 0 0 10px #ff6600, 0 0 20px #ff9900;
+        }
+
+        .button {
+            padding: 12px 25px;
+            font-size: 18px;
+            background-color: #8a2be2;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-color: #6a1cb0;
+            transform: scale(1.05);
+        }
+
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #8a2be2;
+            height: 30px;
+            margin-top: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .message {
+            font-size: 18px;
+            color: #8a2be2;
+            margin-top: 15px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="margin-bottom: 0px;">Happy Birthday Chynthia!!</h1>
+    <h1 style="margin-top: 0px; margin-bottom: 50px;">🥳🎉🎉</h1>
+    
+    <div class="cake-container">
+        <!-- Lilin akan ditambahkan oleh JavaScript -->
+        <div class="frosting"></div>
+        <div class="cake"></div>
+    </div>
+    
+    <div class="countdown" id="countdown"></div>
+    <div class="message" id="message"></div>
+    <button class="button" id="actionButton">Nyalakan Lilin</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cakeContainer = document.querySelector('.cake-container');
+            const actionButton = document.getElementById('actionButton');
+            const countdownElement = document.getElementById('countdown');
+            const messageElement = document.getElementById('message');
+            
+            let candles = [];
+            let flames = [];
+            let flameAnimations = [];
+            let isLit = false;
+            let countdownInterval;
+            
+            // Membuat 5 lilin
+            function createCandles() {
+                for (let i = 0; i < 5; i++) {
+                    const candle = document.createElement('div');
+                    candle.className = 'candle';
+                    candle.style.left = `${50 + i * 50}px`;
+                    
+                    const flame = document.createElement('div');
+                    flame.className = 'flame';
+                    flame.style.left = `${49 + i * 50}px`;
+                    flame.id = `flame-${i}`;
+                    
+                    cakeContainer.appendChild(candle);
+                    cakeContainer.appendChild(flame);
+                    
+                    candles.push(candle);
+                    flames.push(flame);
+                }
+            }
+            
+            // Menyalakan lilin
+            function lightCandles() {
+                if (!isLit) {
+                    flames.forEach(flame => {
+                        flame.style.opacity = '1';
+                        animateFlame(flame);
+                    });
+                    isLit = true;
+                    actionButton.textContent = 'Tiup Lilin';
+                    messageElement.textContent = 'Tekan tombol untuk meniup! Tiup saat hitungan 0';
+                } else {
+
+                }
+            }
+            
+            // Animasi api lilin
+            function animateFlame(flame) {
+                const animation = flame.animate(
+                    [
+                        { transform: 'scale(1)', opacity: 1 },
+                        { transform: 'scale(1.1)', opacity: 0.9 },
+                        { transform: 'scale(0.9)', opacity: 1 }
+                    ],
+                    {
+                        duration: 500 + Math.random() * 500,
+                        iterations: Infinity,
+                        direction: 'alternate'
+                    }
+                );
+
+                flameAnimations.push(animation); // Simpan referensi animasi
+            }
+            
+            // Mematikan lilin
+            // function blowOutCandles() {
+            //     console.log('mematikan lilin');
+            //     flames.forEach(flame => {
+            //         flame.style.opacity = '0';
+            //     });
+            //     isLit = false;
+            //     console.log(isLit);
+            //     actionButton.textContent = 'Nyalakan Lilin';
+            //     messageElement.textContent = 'Lilin mati! Tekan tombol untuk menyalakan lagi.';
+            // }
+
+            // Modifikasi fungsi blowOutCandles:
+            function blowOutCandles() {
+                console.log('mematikan lilin');
+                
+                // Hentikan semua animasi terlebih dahulu
+                flameAnimations.forEach(anim => anim.cancel());
+                flameAnimations = []; // Kosongkan array animasi
+                
+                flames.forEach(flame => {
+                    flame.style.opacity = '0';
+                    flame.style.transform = 'scale(1)'; // Reset transform
+                });
+                
+                isLit = false;
+                console.log(isLit);
+                actionButton.textContent = 'Nyalakan Lilin';
+                messageElement.textContent = 'Lilin mati! Tekan tombol untuk menyalakan lagi.';
+            }
+            
+            // Countdown untuk meniup lilin
+            function startCountdown() {
+                let count = 3;
+                countdownElement.style.opacity = '1';
+                countdownElement.textContent = count;
+                
+                countdownInterval = setInterval(() => {
+                    count--;
+                    countdownElement.textContent = count;
+                    
+                    if (count <= 0) {
+                        clearInterval(countdownInterval);
+                        countdownElement.style.opacity = '0';
+                        blowOutCandles();
+                    }
+                }, 1000);
+            }
+            
+            // Tombol aksi
+            actionButton.addEventListener('click', function() {
+                if (!isLit) {
+                    lightCandles();
+                } else {
+                    if (countdownInterval) clearInterval(countdownInterval);
+                    startCountdown();
+                }
+            });
+            
+            // Inisialisasi
+            createCandles();
+            messageElement.textContent = 'Tekan tombol untuk menyalakan lilin.';
+        });
+    </script>
+</body>
+</html>
